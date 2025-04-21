@@ -52,8 +52,13 @@ def main():
                 # === Draw marker ID on image ===
                 corner = corners[i][0]
                 top_left = tuple(corner[0].astype(int))
-                cv2.putText(frame, f"ID: {ids[i][0]}", (top_left[0], top_left[1] - 10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 5)
+                # Format position text
+                position_text = f"ID:{ids[i][0]} x:{t[0]:.2f} y:{t[1]:.2f} z:{t[2]:.2f}"
+
+                # Draw the text next to the top-left corner of the marker
+                cv2.putText(frame, position_text, (top_left[0], top_left[1] - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
+
 
         cv2.imshow("ArUco Detection", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
