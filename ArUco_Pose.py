@@ -61,7 +61,7 @@ def main():
 
 
         cv2.imshow("ArUco Detection", frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if cv2.waitKey(1) == 27:
             break
 
     cap.release()
