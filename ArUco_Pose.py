@@ -57,7 +57,7 @@ def main():
 
                 # Draw the text next to the top-left corner of the marker
                 cv2.putText(frame, position_text, (top_left[0], top_left[1] - 10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (150, 150, 150), 2)
 
 
         cv2.imshow("ArUco Detection", frame)

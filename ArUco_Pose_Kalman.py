@@ -38,7 +38,7 @@ def main():
     camera_matrix, dist_coeffs = load_camera_parameters(yml_file)
     kalman = create_kalman_filter()
 
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
     if not cap.isOpened():
         print("Camera not detected")
         return
