@@ -13,6 +13,12 @@ def load_camera_parameters(yml_path):
     fs.release()
     return camera_matrix, dist_coeffs
 
+# === Get marker center from 4 corners ===
+def get_marker_center(corner):
+    c = corner.reshape((4, 2))
+    center = np.mean(c, axis=0).astype(int)
+    return tuple(center)
+
 # === Main ===
 def main():
     yml_file = "camera_intrinsics.yml"
@@ -40,6 +46,7 @@ def main():
         corners, ids, _ = detector.detectMarkers(gray)
 
         marker_positions = {}
+        marker_centers = {}
 
         if ids is not None and len(ids) > 0:
             aruco.drawDetectedMarkers(frame, corners, ids)
@@ -49,13 +56,13 @@ def main():
                 marker_id = ids[i][0]
                 t = tvecs[i][0]
                 marker_positions[marker_id] = t
+                marker_centers[marker_id] = get_marker_center(corners[i])
 
-                # Draw axes
+                # Draw axis
                 cv2.drawFrameAxes(frame, camera_matrix, dist_coeffs, rvecs[i], tvecs[i], 0.03)
 
-                # Floating box with position info
-                marker_corner = corners[i][0][0]
-                marker_x, marker_y = int(marker_corner[0]), int(marker_corner[1])
+                # Draw floating info box
+                marker_x, marker_y = marker_centers[marker_id]
                 text_lines = [
                     f"ID: {marker_id}",
                     f"X: {t[0]:.2f} m",
@@ -66,8 +73,10 @@ def main():
                 font_scale = 0.5
                 thickness = 2
                 line_height = 20
+
                 text_width = max([cv2.getTextSize(line, font, font_scale, thickness)[0][0] for line in text_lines])
                 text_height = line_height * len(text_lines)
+
                 padding = 10
                 box_w = text_width + padding * 2
                 box_h = text_height + padding
@@ -75,6 +84,7 @@ def main():
                 box_y = marker_y - box_h - 10
                 if box_y < 0:
                     box_y = marker_y + 20
+
                 overlay = frame.copy()
                 cv2.rectangle(overlay, (box_x, box_y), (box_x + box_w, box_y + box_h), (255, 255, 255), -1)
                 frame = cv2.addWeighted(overlay, 0.4, frame, 0.6, 0)
@@ -84,25 +94,22 @@ def main():
                     ty = box_y + padding + j * line_height
                     cv2.putText(frame, line, (tx, ty), font, font_scale, (0, 0, 0), thickness)
 
-            # === Draw lines and distances between all pairs ===
+            # === Draw lines and distance labels between all unique pairs ===
             font = cv2.FONT_HERSHEY_SIMPLEX
-            all_pairs = list(itertools.combinations(marker_positions.items(), 2))
-            for (id1, p1), (id2, p2) in all_pairs:
+            pairs = list(itertools.combinations(marker_positions.keys(), 2))
+
+            for id1, id2 in pairs:
+                p1 = marker_positions[id1]
+                p2 = marker_positions[id2]
                 distance = np.linalg.norm(p1 - p2)
 
-                # Project to 2D
-                rvec = np.zeros((1, 3))
-                tvec = np.zeros((1, 3))
-                imgpt1, _ = cv2.projectPoints(np.array([p1]), rvec, tvec, camera_matrix, dist_coeffs)
-                imgpt2, _ = cv2.projectPoints(np.array([p2]), rvec, tvec, camera_matrix, dist_coeffs)
+                pt1 = marker_centers[id1]
+                pt2 = marker_centers[id2]
 
-                pt1 = tuple(imgpt1[0][0].astype(int))
-                pt2 = tuple(imgpt2[0][0].astype(int))
-
-                # Draw red line
+                # Draw line
                 cv2.line(frame, pt1, pt2, (0, 0, 255), 2)
 
-                # Distance label at midpoint
+                # Draw label at midpoint
                 mx = (pt1[0] + pt2[0]) // 2
                 my = (pt1[1] + pt2[1]) // 2
                 label = f"{distance:.2f} m"

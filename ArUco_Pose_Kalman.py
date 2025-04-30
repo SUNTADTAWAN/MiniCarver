@@ -1,13 +1,7 @@
 import cv2
 import cv2.aruco as aruco
 import numpy as np
-import time
-
-# === Kalman Filter Tuning Parameters ===
-PROCESS_NOISE = 1e-3
-MEASUREMENT_NOISE = 1e-2
-INITIAL_ERROR = 1
-DELTA_TIME = 1.0  # for constant velocity model
+import itertools
 
 # === Load camera intrinsics from YML ===
 def load_camera_parameters(yml_path):
@@ -19,25 +13,28 @@ def load_camera_parameters(yml_path):
     fs.release()
     return camera_matrix, dist_coeffs
 
-# === Create Kalman Filter for 3D position ===
+# === Create Kalman filter for a marker ===
 def create_kalman_filter():
     kf = cv2.KalmanFilter(6, 3)
-
     kf.measurementMatrix = np.eye(3, 6, dtype=np.float32)
     kf.transitionMatrix = np.array([
-        [1, 0, 0, DELTA_TIME, 0, 0],
-        [0, 1, 0, 0, DELTA_TIME, 0],
-        [0, 0, 1, 0, 0, DELTA_TIME],
+        [1, 0, 0, 1, 0, 0],
+        [0, 1, 0, 0, 1, 0],
+        [0, 0, 1, 0, 0, 1],
         [0, 0, 0, 1, 0, 0],
         [0, 0, 0, 0, 1, 0],
         [0, 0, 0, 0, 0, 1]
     ], dtype=np.float32)
-
-    kf.processNoiseCov = np.eye(6, dtype=np.float32) * PROCESS_NOISE
-    kf.measurementNoiseCov = np.eye(3, dtype=np.float32) * MEASUREMENT_NOISE
-    kf.errorCovPost = np.eye(6, dtype=np.float32) * INITIAL_ERROR
-
+    kf.processNoiseCov = np.eye(6, dtype=np.float32) * 1e-3
+    kf.measurementNoiseCov = np.eye(3, dtype=np.float32) * 1e-2
+    kf.errorCovPost = np.eye(6, dtype=np.float32)
     return kf
+
+# === Get center of marker from corners ===
+def get_marker_center(corner):
+    c = corner.reshape((4, 2))
+    center = np.mean(c, axis=0).astype(int)
+    return tuple(center)
 
 # === Main ===
 def main():
@@ -46,8 +43,6 @@ def main():
     aruco_dict_type = aruco.DICT_4X4_1000
 
     camera_matrix, dist_coeffs = load_camera_parameters(yml_file)
-    kalman = create_kalman_filter()
-
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
         print("Camera not detected")
@@ -55,114 +50,97 @@ def main():
 
     aruco_dict = aruco.getPredefinedDictionary(aruco_dict_type)
     parameters = aruco.DetectorParameters()
+    detector = aruco.ArucoDetector(aruco_dict, parameters)
 
-    last_time = time.time()
-    fps = 0
+    kalman_filters = {}  # ID -> KalmanFilter
 
+    print("Press 'ESC' to quit")
     while True:
         ret, frame = cap.read()
         if not ret:
             break
 
-        current_time = time.time()
-        dt = current_time - last_time
-        fps = 1.0 / dt
-        last_time = current_time
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        corners, ids, _ = detector.detectMarkers(gray)
 
-        # Detect markers
-        corners, ids, _ = aruco.detectMarkers(frame, aruco_dict, parameters=parameters)
+        marker_positions = {}
+        marker_centers = {}
 
         if ids is not None and len(ids) > 0:
-            rvec, tvec, _ = aruco.estimatePoseSingleMarkers(corners, marker_length, camera_matrix, dist_coeffs)
+            aruco.drawDetectedMarkers(frame, corners, ids)
+            rvecs, tvecs, _ = aruco.estimatePoseSingleMarkers(corners, marker_length, camera_matrix, dist_coeffs)
 
             for i in range(len(ids)):
-                position = tvec[i][0]
+                marker_id = ids[i][0]
+                t_raw = tvecs[i][0]
+                corner = corners[i]
 
-                # Kalman Filter update
-                kalman.predict()
-                kalman.correct(np.array([[position[0]], [position[1]], [position[2]]], dtype=np.float32))
+                # Create Kalman if new marker
+                if marker_id not in kalman_filters:
+                    kalman_filters[marker_id] = create_kalman_filter()
 
-                # Draw detected markers and axes
-                aruco.drawDetectedMarkers(frame, corners, ids)
-                cv2.drawFrameAxes(frame, camera_matrix, dist_coeffs, rvec[i], tvec[i], 0.03)
+                kf = kalman_filters[marker_id]
+                kf.predict()
+                kf.correct(np.array([[t_raw[0]], [t_raw[1]], [t_raw[2]]], dtype=np.float32))
+                t_filtered = kf.statePost[:3].flatten()
 
-                # Center of marker
-                corner = corners[i][0]
-                center_x = int(np.mean(corner[:, 0]))
-                center_y = int(np.mean(corner[:, 1]))
+                marker_positions[marker_id] = t_filtered
+                marker_centers[marker_id] = get_marker_center(corner)
 
-                # Get filtered position
-                filtered_pos = kalman.statePost[:3].flatten()
+                # Draw axis
+                cv2.drawFrameAxes(frame, camera_matrix, dist_coeffs, rvecs[i], tvecs[i], 0.03)
 
-                # Draw local background box (bigger because 4 lines now)
-                box_w, box_h = 220, 120
+                # Draw floating info box
+                marker_x, marker_y = marker_centers[marker_id]
+                text_lines = [
+                    f"ID: {marker_id}",
+                    f"X: {t_filtered[0]:.2f} m",
+                    f"Y: {t_filtered[1]:.2f} m",
+                    f"Z: {t_filtered[2]:.2f} m"
+                ]
+                font = cv2.FONT_HERSHEY_SIMPLEX
+                font_scale = 0.5
+                thickness = 2
+                line_height = 20
+
+                text_width = max([cv2.getTextSize(line, font, font_scale, thickness)[0][0] for line in text_lines])
+                text_height = line_height * len(text_lines)
+
+                padding = 10
+                box_w = text_width + padding * 2
+                box_h = text_height + padding
+                box_x = marker_x + 10
+                box_y = marker_y - box_h - 10
+                if box_y < 0:
+                    box_y = marker_y + 20
+
                 overlay = frame.copy()
-                cv2.rectangle(
-                    overlay,
-                    (center_x + 10, center_y - 10),
-                    (center_x + 10 + box_w, center_y - 10 + box_h),
-                    (255, 255, 255),
-                    -1
-                )
-                alpha = 0.6
-                frame = cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0)
+                cv2.rectangle(overlay, (box_x, box_y), (box_x + box_w, box_y + box_h), (255, 255, 255), -1)
+                frame = cv2.addWeighted(overlay, 0.4, frame, 0.6, 0)
 
-                # Write marker info (separate lines for x, y, z)
-                cv2.putText(
-                    frame,
-                    f"ID {ids[i][0]}",
-                    (center_x + 20, center_y + 10),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5,
-                    (0, 0, 0),
-                    2
-                )
-                cv2.putText(
-                    frame,
-                    f"x = {filtered_pos[0]:.2f}",
-                    (center_x + 20, center_y + 35),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5,
-                    (0, 0, 0),
-                    2
-                )
-                cv2.putText(
-                    frame,
-                    f"y = {filtered_pos[1]:.2f}",
-                    (center_x + 20, center_y + 60),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5,
-                    (0, 0, 0),
-                    2
-                )
-                cv2.putText(
-                    frame,
-                    f"z = {filtered_pos[2]:.2f}",
-                    (center_x + 20, center_y + 85),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5,
-                    (0, 0, 0),
-                    2
-                )
+                for j, line in enumerate(text_lines):
+                    tx = box_x + padding
+                    ty = box_y + padding + j * line_height
+                    cv2.putText(frame, line, (tx, ty), font, font_scale, (0, 0, 0), thickness)
 
-        else:
-            # Only predict if no detection
-            kalman.predict()
+            # === Draw lines and distances between all marker pairs ===
+            for (id1, id2) in itertools.combinations(marker_positions, 2):
+                t1, t2 = marker_positions[id1], marker_positions[id2]
+                c1, c2 = marker_centers[id1], marker_centers[id2]
 
-        # Show FPS separately
-        cv2.putText(
-            frame,
-            f"FPS: {fps:.1f}",
-            (10, 30),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.7,
-            (0, 255, 0),
-            2
-        )
+                distance = np.linalg.norm(t1 - t2)
+                midpoint = ((c1[0] + c2[0]) // 2, (c1[1] + c2[1]) // 2)
+                label = f"{distance:.2f} m"
 
-        # Display result
-        cv2.imshow("Aruco Tracker + Kalman + Moving Info Box", frame)
-        if cv2.waitKey(1) == 27:  # ESC to quit
+                # Line and label
+                cv2.line(frame, c1, c2, (0, 0, 255), 2)
+                (tw, th), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
+                cv2.rectangle(frame, (midpoint[0] - 5, midpoint[1] - th - 5),
+                              (midpoint[0] + tw + 5, midpoint[1] + 5), (255, 255, 255), -1)
+                cv2.putText(frame, label, midpoint, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
+
+        cv2.imshow("ArUco Detection with Kalman + Distance", frame)
+        if cv2.waitKey(1) == 27:  # ESC
             break
 
     cap.release()
