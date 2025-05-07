@@ -1,0 +1,8 @@
+source;share/Tranform_Robot/hook/cmake_prefix_path.ps1
+source;share/Tranform_Robot/hook/cmake_prefix_path.dsv
+source;share/Tranform_Robot/hook/cmake_prefix_path.sh
+source;share/Tranform_Robot/local_setup.bash
+source;share/Tranform_Robot/local_setup.dsv
+source;share/Tranform_Robot/local_setup.ps1
+source;share/Tranform_Robot/local_setup.sh
+source;share/Tranform_Robot/local_setup.zsh

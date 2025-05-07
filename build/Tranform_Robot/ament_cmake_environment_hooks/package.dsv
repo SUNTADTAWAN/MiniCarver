@@ -1,0 +1,4 @@
+source;share/Tranform_Robot/local_setup.bash
+source;share/Tranform_Robot/local_setup.dsv
+source;share/Tranform_Robot/local_setup.sh
+source;share/Tranform_Robot/local_setup.zsh

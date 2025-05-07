@@ -1,0 +1,88 @@
+[0.008s] Invoking command in '/home/tadtawan/MiniCarver/build/Tranform_Robot': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/tadtawan/fra532_lecture5_ws/install/mir_driver:/home/tadtawan/fra532_lecture5_ws/install/twist_stamper:/home/tadtawan/fra532_lecture5_ws/install/mir_restapi:/opt/ros/humble /usr/bin/cmake /home/tadtawan/MiniCarver/src/Tranform_Robot -DCMAKE_INSTALL_PREFIX=/home/tadtawan/MiniCarver/install/Tranform_Robot
+[0.044s] -- The C compiler identification is GNU 11.4.0
+[0.086s] -- The CXX compiler identification is GNU 11.4.0
+[0.091s] -- Detecting C compiler ABI info
+[0.161s] -- Detecting C compiler ABI info - done
+[0.169s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.169s] -- Detecting C compile features
+[0.170s] -- Detecting C compile features - done
+[0.174s] -- Detecting CXX compiler ABI info
+[0.260s] -- Detecting CXX compiler ABI info - done
+[0.264s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.264s] -- Detecting CXX compile features
+[0.265s] -- Detecting CXX compile features - done
+[0.267s] -- Found ament_cmake: 1.3.11 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.380s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[0.447s] -- Found rclcpp: 16.0.11 (/opt/ros/humble/share/rclcpp/cmake)
+[0.477s] -- Found rosidl_generator_c: 3.1.6 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[0.481s] -- Found rosidl_adapter: 3.1.6 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[0.487s] -- Found rosidl_generator_cpp: 3.1.6 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[0.495s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.506s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.538s] -- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[0.540s] -- Found rmw_fastrtps_cpp: 6.2.7 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+[0.594s] -- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.2")  
+[0.612s] -- Found FastRTPS: /opt/ros/humble/include  
+[0.638s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[0.644s] -- Looking for pthread.h
+[0.703s] -- Looking for pthread.h - found
+[0.703s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[0.769s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+[0.769s] -- Found Threads: TRUE  
+[0.810s] -- Found rclpy: 3.3.15 (/opt/ros/humble/share/rclpy/cmake)
+[0.862s] WARNING: Package name "Tranform_Robot" does not follow the naming conventions. It should start with a lower case letter and only contain lower case letters, digits, underscores, and dashes.
+[0.901s] WARNING: Package name "Tranform_Robot" does not follow the naming conventions. It should start with a lower case letter and only contain lower case letters, digits, underscores, and dashes.
+[0.912s] -- Configuring done
+[0.920s] -- Generating done
+[0.922s] -- Build files have been written to: /home/tadtawan/MiniCarver/build/Tranform_Robot
+[0.930s] Invoked command in '/home/tadtawan/MiniCarver/build/Tranform_Robot' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/tadtawan/fra532_lecture5_ws/install/mir_driver:/home/tadtawan/fra532_lecture5_ws/install/twist_stamper:/home/tadtawan/fra532_lecture5_ws/install/mir_restapi:/opt/ros/humble /usr/bin/cmake /home/tadtawan/MiniCarver/src/Tranform_Robot -DCMAKE_INSTALL_PREFIX=/home/tadtawan/MiniCarver/install/Tranform_Robot
+[0.930s] Invoking command in '/home/tadtawan/MiniCarver/build/Tranform_Robot': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/tadtawan/fra532_lecture5_ws/install/mir_driver:/home/tadtawan/fra532_lecture5_ws/install/twist_stamper:/home/tadtawan/fra532_lecture5_ws/install/mir_restapi:/opt/ros/humble /usr/bin/cmake --build /home/tadtawan/MiniCarver/build/Tranform_Robot -- -j16 -l16
+[0.961s] [ 50%] [32mBuilding CXX object CMakeFiles/cpp_node_test.dir/src/cpp_node.cpp.o[0m
+[0.966s] [ 50%] Built target ament_cmake_python_copy_Tranform_Robot
+[1.136s] running egg_info
+[1.136s] creating Tranform_Robot.egg-info
+[1.136s] writing Tranform_Robot.egg-info/PKG-INFO
+[1.136s] writing dependency_links to Tranform_Robot.egg-info/dependency_links.txt
+[1.136s] writing top-level names to Tranform_Robot.egg-info/top_level.txt
+[1.137s] writing manifest file 'Tranform_Robot.egg-info/SOURCES.txt'
+[1.164s] reading manifest file 'Tranform_Robot.egg-info/SOURCES.txt'
+[1.164s] writing manifest file 'Tranform_Robot.egg-info/SOURCES.txt'
+[1.183s] [ 50%] Built target ament_cmake_python_build_Tranform_Robot_egg
+[1.307s] [100%] [32m[1mLinking CXX executable cpp_node_test[0m
+[1.461s] [100%] Built target cpp_node_test
+[1.469s] Invoked command in '/home/tadtawan/MiniCarver/build/Tranform_Robot' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/tadtawan/fra532_lecture5_ws/install/mir_driver:/home/tadtawan/fra532_lecture5_ws/install/twist_stamper:/home/tadtawan/fra532_lecture5_ws/install/mir_restapi:/opt/ros/humble /usr/bin/cmake --build /home/tadtawan/MiniCarver/build/Tranform_Robot -- -j16 -l16
+[1.476s] Invoking command in '/home/tadtawan/MiniCarver/build/Tranform_Robot': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/tadtawan/fra532_lecture5_ws/install/mir_driver:/home/tadtawan/fra532_lecture5_ws/install/twist_stamper:/home/tadtawan/fra532_lecture5_ws/install/mir_restapi:/opt/ros/humble /usr/bin/cmake --install /home/tadtawan/MiniCarver/build/Tranform_Robot
+[1.483s] -- Install configuration: ""
+[1.483s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/environment/pythonpath.sh
+[1.484s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/environment/pythonpath.dsv
+[1.484s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/local/lib/python3.10/dist-packages/Tranform_Robot-0.0.0-py3.10.egg-info
+[1.484s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/local/lib/python3.10/dist-packages/Tranform_Robot-0.0.0-py3.10.egg-info/top_level.txt
+[1.484s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/local/lib/python3.10/dist-packages/Tranform_Robot-0.0.0-py3.10.egg-info/dependency_links.txt
+[1.484s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/local/lib/python3.10/dist-packages/Tranform_Robot-0.0.0-py3.10.egg-info/SOURCES.txt
+[1.484s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/local/lib/python3.10/dist-packages/Tranform_Robot-0.0.0-py3.10.egg-info/PKG-INFO
+[1.484s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/local/lib/python3.10/dist-packages/Tranform_Robot
+[1.484s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/local/lib/python3.10/dist-packages/Tranform_Robot/__init__.py
+[1.484s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/local/lib/python3.10/dist-packages/Tranform_Robot/dummy_module.py
+[1.510s] Listing '/home/tadtawan/MiniCarver/install/Tranform_Robot/local/lib/python3.10/dist-packages/Tranform_Robot'...
+[1.510s] Compiling '/home/tadtawan/MiniCarver/install/Tranform_Robot/local/lib/python3.10/dist-packages/Tranform_Robot/__init__.py'...
+[1.510s] Compiling '/home/tadtawan/MiniCarver/install/Tranform_Robot/local/lib/python3.10/dist-packages/Tranform_Robot/dummy_module.py'...
+[1.513s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/lib/Tranform_Robot/dummy_script.py
+[1.513s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/lib/Tranform_Robot/cpp_node_test
+[1.513s] -- Set runtime path of "/home/tadtawan/MiniCarver/install/Tranform_Robot/lib/Tranform_Robot/cpp_node_test" to ""
+[1.513s] -- Up-to-date: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot
+[1.513s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/ament_index/resource_index/package_run_dependencies/Tranform_Robot
+[1.513s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/ament_index/resource_index/parent_prefix_path/Tranform_Robot
+[1.513s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/environment/ament_prefix_path.sh
+[1.513s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/environment/ament_prefix_path.dsv
+[1.513s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/environment/path.sh
+[1.514s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/environment/path.dsv
+[1.514s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/local_setup.bash
+[1.514s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/local_setup.sh
+[1.514s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/local_setup.zsh
+[1.514s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/local_setup.dsv
+[1.514s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/package.dsv
+[1.514s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/ament_index/resource_index/packages/Tranform_Robot
+[1.514s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/cmake/Tranform_RobotConfig.cmake
+[1.514s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/cmake/Tranform_RobotConfig-version.cmake
+[1.514s] -- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/package.xml
+[1.516s] Invoked command in '/home/tadtawan/MiniCarver/build/Tranform_Robot' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/tadtawan/fra532_lecture5_ws/install/mir_driver:/home/tadtawan/fra532_lecture5_ws/install/twist_stamper:/home/tadtawan/fra532_lecture5_ws/install/mir_restapi:/opt/ros/humble /usr/bin/cmake --install /home/tadtawan/MiniCarver/build/Tranform_Robot

@@ -1,0 +1,57 @@
+-- Found ament_cmake: 1.3.11 (/opt/ros/humble/share/ament_cmake/cmake)
+-- Found rclcpp: 16.0.11 (/opt/ros/humble/share/rclcpp/cmake)
+-- Found rosidl_generator_c: 3.1.6 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+-- Found rosidl_adapter: 3.1.6 (/opt/ros/humble/share/rosidl_adapter/cmake)
+-- Found rosidl_generator_cpp: 3.1.6 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+-- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+-- Found rmw_fastrtps_cpp: 6.2.7 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+-- Using RMW implementation 'rmw_fastrtps_cpp' as default
+-- Found rclpy: 3.3.15 (/opt/ros/humble/share/rclpy/cmake)
+WARNING: Package name "Tranform_Robot" does not follow the naming conventions. It should start with a lower case letter and only contain lower case letters, digits, underscores, and dashes.
+WARNING: Package name "Tranform_Robot" does not follow the naming conventions. It should start with a lower case letter and only contain lower case letters, digits, underscores, and dashes.
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/tadtawan/MiniCarver/build/Tranform_Robot
+[35m[1mConsolidate compiler generated dependencies of target cpp_node_test[0m
+[100%] Built target cpp_node_test
+[100%] Built target ament_cmake_python_copy_Tranform_Robot
+running egg_info
+writing Tranform_Robot.egg-info/PKG-INFO
+writing dependency_links to Tranform_Robot.egg-info/dependency_links.txt
+writing top-level names to Tranform_Robot.egg-info/top_level.txt
+reading manifest file 'Tranform_Robot.egg-info/SOURCES.txt'
+writing manifest file 'Tranform_Robot.egg-info/SOURCES.txt'
+[100%] Built target ament_cmake_python_build_Tranform_Robot_egg
+-- Install configuration: ""
+-- Up-to-date: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/environment/pythonpath.sh
+-- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/environment/pythonpath.dsv
+-- Up-to-date: /home/tadtawan/MiniCarver/install/Tranform_Robot/local/lib/python3.10/dist-packages/Tranform_Robot-0.0.0-py3.10.egg-info
+-- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/local/lib/python3.10/dist-packages/Tranform_Robot-0.0.0-py3.10.egg-info/top_level.txt
+-- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/local/lib/python3.10/dist-packages/Tranform_Robot-0.0.0-py3.10.egg-info/dependency_links.txt
+-- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/local/lib/python3.10/dist-packages/Tranform_Robot-0.0.0-py3.10.egg-info/SOURCES.txt
+-- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/local/lib/python3.10/dist-packages/Tranform_Robot-0.0.0-py3.10.egg-info/PKG-INFO
+-- Up-to-date: /home/tadtawan/MiniCarver/install/Tranform_Robot/local/lib/python3.10/dist-packages/Tranform_Robot
+-- Up-to-date: /home/tadtawan/MiniCarver/install/Tranform_Robot/local/lib/python3.10/dist-packages/Tranform_Robot/__init__.py
+-- Up-to-date: /home/tadtawan/MiniCarver/install/Tranform_Robot/local/lib/python3.10/dist-packages/Tranform_Robot/dummy_module.py
+Listing '/home/tadtawan/MiniCarver/install/Tranform_Robot/local/lib/python3.10/dist-packages/Tranform_Robot'...
+-- Up-to-date: /home/tadtawan/MiniCarver/install/Tranform_Robot/lib/Tranform_Robot/dummy_script.py
+-- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/lib/Tranform_Robot/tranform_robot.py
+-- Up-to-date: /home/tadtawan/MiniCarver/install/Tranform_Robot/lib/Tranform_Robot/cpp_node_test
+-- Up-to-date: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot
+-- Up-to-date: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/ament_index/resource_index/package_run_dependencies/Tranform_Robot
+-- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/ament_index/resource_index/parent_prefix_path/Tranform_Robot
+-- Up-to-date: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/environment/ament_prefix_path.sh
+-- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/environment/ament_prefix_path.dsv
+-- Up-to-date: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/environment/path.sh
+-- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/environment/path.dsv
+-- Up-to-date: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/local_setup.bash
+-- Up-to-date: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/local_setup.sh
+-- Up-to-date: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/local_setup.zsh
+-- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/local_setup.dsv
+-- Installing: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/package.dsv
+-- Up-to-date: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/ament_index/resource_index/packages/Tranform_Robot
+-- Up-to-date: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/cmake/Tranform_RobotConfig.cmake
+-- Up-to-date: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/cmake/Tranform_RobotConfig-version.cmake
+-- Up-to-date: /home/tadtawan/MiniCarver/install/Tranform_Robot/share/Tranform_Robot/package.xml
