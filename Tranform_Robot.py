@@ -99,16 +99,16 @@ def main():
                 cv2.drawFrameAxes(frame, camera_matrix, dist_coeffs, rvec_inv, tvec_inv, marker_length * 0.5)
 
                 T_marker_robot2 = np.eye(4)
-                if marker_id == 451:
-                    T_marker_robot2[0, 3] = -0.225
+                if marker_id == 451:                                                    # Front
+                    T_marker_robot2[0, 3] = -0.225 
                     R, _ = cv2.Rodrigues(np.array([0, 0, 0], dtype=np.float64))
-                elif marker_id == 455:
+                elif marker_id == 455:                                                  # Back
                     T_marker_robot2[0, 3] = +0.225
                     R, _ = cv2.Rodrigues(np.array([0, 0, np.pi], dtype=np.float64))
-                elif marker_id == 457:
+                elif marker_id == 457:                                                  # Right
                     T_marker_robot2[1, 3] = -0.125
                     R, _ = cv2.Rodrigues(np.array([0, 0, -np.pi/2], dtype=np.float64))
-                elif marker_id == 453:
+                elif marker_id == 453:                                                  # Left
                     T_marker_robot2[1, 3] = +0.125
                     R, _ = cv2.Rodrigues(np.array([0, 0, np.pi/2], dtype=np.float64))
                 else:
