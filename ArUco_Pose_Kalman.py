@@ -43,7 +43,7 @@ def main():
     aruco_dict_type = aruco.DICT_4X4_1000
 
     camera_matrix, dist_coeffs = load_camera_parameters(yml_file)
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(5)
     if not cap.isOpened():
         print("Camera not detected")
         return
