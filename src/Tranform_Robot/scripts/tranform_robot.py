@@ -4,6 +4,9 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped, TransformStamped
 from visualization_msgs.msg import Marker
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge
+
 import cv2
 import cv2.aruco as aruco
 import numpy as np
@@ -35,6 +38,9 @@ class PosePublisher(Node):
         self.pose_pub = self.create_publisher(PoseStamped, '/robot1_pose', 10)
         self.tf_broadcaster = TransformBroadcaster(self)
         self.marker_pub = self.create_publisher(Marker, '/robot2_direction', 1)
+        self.image_pub = self.create_publisher(Image, '/camera/image_raw', 10)
+
+        self.bridge = CvBridge()
 
     def publish_pose_and_tf(self, x, z, yaw):
         now = self.get_clock().now().to_msg()
@@ -74,29 +80,34 @@ class PosePublisher(Node):
         marker.id = 0
         marker.type = Marker.ARROW
         marker.action = Marker.ADD
-        marker.scale.x = 0.3  # length
+        marker.scale.x = 0.3
         marker.scale.y = 0.05
         marker.scale.z = 0.05
         marker.color.r = 0.0
         marker.color.g = 1.0
         marker.color.b = 0.0
         marker.color.a = 1.0
-        marker.pose.orientation.w = 1.0  # no rotation
+        marker.pose.orientation.w = 1.0
         marker.pose.position.x = 0.0
         marker.pose.position.y = 0.0
         marker.pose.position.z = 0.0
         self.marker_pub.publish(marker)
 
+    def publish_image(self, frame):
+        msg = self.bridge.cv2_to_imgmsg(frame, encoding="bgr8")
+        msg.header.stamp = self.get_clock().now().to_msg()
+        msg.header.frame_id = "camera_link"
+        self.image_pub.publish(msg)
+
 
 def main():
     rclpy.init()
     node = PosePublisher()
-    yml_file = "/home/tadtawan/MiniCarver/src/Tranform_Robot/camera_intrinsics.yml"
-
+    yml_file = "/home/tadtawan/MiniCarver/MiniCarver/src/Tranform_Robot/camera_intrinsics.yml"
     marker_length = 0.08
     aruco_dict_type = aruco.DICT_4X4_1000
     camera_matrix, dist_coeffs = load_camera_parameters(yml_file)
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(2)
 
     if not cap.isOpened():
         node.get_logger().error("❌ Camera not detected.")
@@ -131,16 +142,16 @@ def main():
                 T_marker_camera = get_transform_matrix(rvec, tvec)
                 T_marker_robot2 = np.eye(4)
 
-                if marker_id == 451:  # Front
+                if marker_id == 451:
                     T_marker_robot2[0, 3] = -0.225
                     rot_vec = [0, 0, np.pi]
-                elif marker_id == 455:  # Back
+                elif marker_id == 455:
                     T_marker_robot2[0, 3] = +0.225
                     rot_vec = [0, 0, 0]
-                elif marker_id == 453:  # Left
+                elif marker_id == 453:
                     T_marker_robot2[1, 3] = +0.125
                     rot_vec = [0, 0, -np.pi / 2]
-                elif marker_id == 457:  # Right
+                elif marker_id == 457:
                     T_marker_robot2[1, 3] = -0.125
                     rot_vec = [0, 0, np.pi / 2]
                 else:
@@ -158,7 +169,7 @@ def main():
 
                 x = T_robot2_robot1[0, 3]
                 z = T_robot2_robot1[2, 3]
-                yaw = math.atan2(T_robot2_robot1[2, 0], T_robot2_robot1[0, 0])
+                yaw = math.atan2(-T_robot2_robot1[0, 2], T_robot2_robot1[2, 2])
 
                 print("Rotation matrix used for marker:\n", R)
                 print("T_robot2_robot1:\n", T_robot2_robot1)
@@ -167,6 +178,8 @@ def main():
                 node.publish_pose_and_tf(x, z, yaw)
 
         node.publish_robot2_arrow()
+        node.publish_image(frame)
+
         rclpy.spin_once(node, timeout_sec=0.01)
         cv2.imshow("ArUco Debug", frame)
         if cv2.waitKey(1) == 27:

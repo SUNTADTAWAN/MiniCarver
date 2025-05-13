@@ -1,7 +1,0 @@
-setup.py
-Tranform_Robot/__init__.py
-Tranform_Robot/dummy_module.py
-Tranform_Robot.egg-info/PKG-INFO
-Tranform_Robot.egg-info/SOURCES.txt
-Tranform_Robot.egg-info/dependency_links.txt
-Tranform_Robot.egg-info/top_level.txt
