@@ -1,103 +1,112 @@
 import cv2
 import numpy as np
+import time
 
-# --- ArUco marker and camera setup ---
+# ======= Kalman Filter Creation =======
+def create_kf_constant_velocity(dt, accel_std, meas_std):
+    F = np.array([[1, 0, 0, dt, 0,  0],
+                  [0, 1, 0, 0,  dt, 0],
+                  [0, 0, 1, 0,  0,  dt],
+                  [0, 0, 0, 1,  0,  0],
+                  [0, 0, 0, 0,  1,  0],
+                  [0, 0, 0, 0,  0,  1]], dtype=np.float32)
+
+    H = np.eye(3, 6, dtype=np.float32)
+    Q = np.eye(6, dtype=np.float32) * accel_std**2
+    R = np.eye(3, dtype=np.float32) * meas_std**2
+    x = np.zeros((6,), dtype=np.float32)
+    P = np.eye(6, dtype=np.float32)
+    P[3:, 3:] *= 1000.0
+    return F, H, Q, R, x, P
+
+def create_kf_constant_acceleration(dt, jerk_std, meas_std):
+    F = np.eye(9, dtype=np.float32)
+    for i in range(3):
+        F[i, i+3] = dt
+        F[i, i+6] = 0.5 * dt**2
+        F[i+3, i+6] = dt
+    H = np.eye(3, 9, dtype=np.float32)
+    Q = np.eye(9, dtype=np.float32) * jerk_std**2
+    R = np.eye(3, dtype=np.float32) * meas_std**2
+    x = np.zeros((9,), dtype=np.float32)
+    P = np.eye(9, dtype=np.float32)
+    P[3:, 3:] *= 1000.0
+    return F, H, Q, R, x, P
+
+# ======= ArUco & Kalman Setup =======
+dt = 1/30.0
+accel_std = 0.1     # Q of Constant_Velo
+meas_std = 1.0      # R
+jerk_std = 0.1      # Q of Constant_Accel
+
 aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_1000)
 aruco_params = cv2.aruco.DetectorParameters()
+detector = cv2.aruco.ArucoDetector(aruco_dict, aruco_params)
 
+camera_matrix = np.array([[1063.7383, 0, 959.8903],
+                          [0, 1077.995, 581.7375],
+                          [0, 0, 1]])
+dist_coeffs = np.array([[0.2217, -0.0257, 0.0268, -0.0141, -0.3499]])
+marker_length = 0.08
 
-# Camera calibration (replace with your actual calibration data)
-camera_matrix = np.array([[600, 0, 320],
-                          [0, 600, 240],
-                          [0,   0,   1]], dtype=np.float32)
-dist_coeffs = np.zeros((5, 1), dtype=np.float32)
-marker_length = 0.1  # meter
+F_v, H_v, Q_v, R_v, x_v, P_v = create_kf_constant_velocity(dt, accel_std, meas_std)
+F_a, H_a, Q_a, R_a, x_a, P_a = create_kf_constant_acceleration(dt, jerk_std, meas_std)
 
-# --- Kalman Filter Setup ---
-dt = 1/30.0  # assuming 30 FPS
-
-F = np.array([[1, 0, 0, dt, 0,  0],
-              [0, 1, 0, 0,  dt, 0],
-              [0, 0, 1, 0,  0,  dt],
-              [0, 0, 0, 1,  0,  0],
-              [0, 0, 0, 0,  1,  0],
-              [0, 0, 0, 0,  0,  1]], dtype=np.float32)
-
-H = np.array([[1, 0, 0, 0, 0, 0],
-              [0, 1, 0, 0, 0, 0],
-              [0, 0, 1, 0, 0, 0]], dtype=np.float32)
-
-# Process noise Q
-accel_std = 1.0
-q11 = (dt**3)/3.0
-q13 = (dt**2)/2.0
-q33 = dt
-Q = np.zeros((6, 6), dtype=np.float32)
-for i in range(3):
-    Q[i, i] = q11
-    Q[i, i+3] = q13
-    Q[i+3, i] = q13
-    Q[i+3, i+3] = q33
-Q *= accel_std**2
-
-# Measurement noise R
-R = np.eye(3, dtype=np.float32) * 0.25
-
-# Initial state
-x_est = np.zeros((6,), dtype=np.float32)
-P = np.eye(6, dtype=np.float32)
-P[3:, 3:] *= 1000.0
-kalman_initialized = False
-
-# --- Start Video Capture ---
+# ======= Main Loop =======
 cap = cv2.VideoCapture(0)
-if not cap.isOpened():
-    print("Camera could not be opened.")
-    exit()
-
-print("Press ESC to exit.")
-while True:
+while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
         break
 
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    corners, ids, _ = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=aruco_params)
+    corners, ids, _ = detector.detectMarkers(gray)
 
-    if ids is not None and len(ids) > 0:
-        rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners, marker_length, camera_matrix, dist_coeffs)
-        tvec = tvecs[0][0]  # use first marker
+    if ids is not None:
+        rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(
+            corners, marker_length, camera_matrix, dist_coeffs)
+        tvec = tvecs[0][0]  # only 1st marker for comparison
 
-        if not kalman_initialized:
-            x_est[:3] = tvec
-            x_est[3:] = 0
-            kalman_initialized = True
+        # ==== Constant Velocity KF ====
+        x_pred_v = F_v @ x_v
+        P_pred_v = F_v @ P_v @ F_v.T + Q_v
+        y_v = tvec - H_v @ x_pred_v
+        S_v = H_v @ P_pred_v @ H_v.T + R_v
+        K_v = P_pred_v @ H_v.T @ np.linalg.inv(S_v)
+        x_v = x_pred_v + K_v @ y_v
+        P_v = (np.eye(6) - K_v @ H_v) @ P_pred_v
 
-        # Prediction
-        x_pred = F @ x_est
-        P_pred = F @ P @ F.T + Q
+        # ==== Constant Acceleration KF ====
+        x_pred_a = F_a @ x_a
+        P_pred_a = F_a @ P_a @ F_a.T + Q_a
+        y_a = tvec - H_a @ x_pred_a
+        S_a = H_a @ P_pred_a @ H_a.T + R_a
+        K_a = P_pred_a @ H_a.T @ np.linalg.inv(S_a)
+        x_a = x_pred_a + K_a @ y_a
+        P_a = (np.eye(9) - K_a @ H_a) @ P_pred_a
 
-        # Update
-        y = tvec - H @ x_pred
-        S = H @ P_pred @ H.T + R
-        K = P_pred @ H.T @ np.linalg.inv(S)
-        x_est = x_pred + K @ y
-        P = (np.eye(6) - K @ H) @ P_pred
+        # ==== Draw results ====
+        raw = frame.copy()
+        kalman_v = frame.copy()
+        kalman_a = frame.copy()
 
-        # Draw
-        cv2.aruco.drawDetectedMarkers(frame, corners, ids)
-        cv2.drawFrameAxes(frame, camera_matrix, dist_coeffs, rvecs[0], tvec, 0.1)
-
-        cv2.putText(frame, f"Raw: {np.round(tvec, 2)}", (10, 30),
+        cv2.drawFrameAxes(raw, camera_matrix, dist_coeffs, rvecs[0], tvec, 0.1)
+        cv2.putText(raw, f"Raw: {np.round(tvec, 2)}", (10, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
-        cv2.putText(frame, f"KF : {np.round(x_est[:3], 2)}", (10, 60),
+
+        cv2.drawFrameAxes(kalman_v, camera_matrix, dist_coeffs, rvecs[0], x_v[:3], 0.1)
+        cv2.putText(kalman_v, f"Vel KF: {np.round(x_v[:3], 2)}", (10, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
-        print("Measured:", np.round(tvec, 2), "Filtered:", np.round(x_est[:3], 2))
-    else:
-        print("No marker detected.")
+        cv2.drawFrameAxes(kalman_a, camera_matrix, dist_coeffs, rvecs[0], x_a[:3], 0.1)
+        cv2.putText(kalman_a, f"Acc KF: {np.round(x_a[:3], 2)}", (10, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
 
-    cv2.imshow("Kalman ArUco Tracker", frame)
+        combined = np.hstack((kalman_a, raw, kalman_v))
+        cv2.imshow("Kalman Comparison: Acceleration | Raw | Velocity", combined)
+    else:
+        cv2.imshow("Kalman Comparison: Acceleration | Raw | Velocity", frame)
+
     if cv2.waitKey(1) == 27:
         break
 
