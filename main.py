@@ -79,7 +79,7 @@ def kalman_predict(kf):
     kf['P'] = kf['F'] @ kf['P'] @ kf['F'].T + kf['Q']
 
 def kalman_update(kf, measurement):
-    """Update step"""
+    """Update step with Joseph form covariance update for numerical stability"""
     if not kf['initialized']:
         # Initialize state with first measurement
         if len(kf['x']) == 6:  # CV model
@@ -101,8 +101,15 @@ def kalman_update(kf, measurement):
         S_inv = np.linalg.pinv(S)
     
     K = kf['P'] @ kf['H'].T @ S_inv  # Kalman gain
-    kf['x'] = kf['x'] + K @ y
-    kf['P'] = (np.eye(len(kf['x'])) - K @ kf['H']) @ kf['P']
+    kf['x'] = kf['x'] + K @ y  # State update
+    
+    # Joseph form covariance update for numerical stability
+    # P = (I - K*H)*P*(I - K*H)' + K*R*K'
+    I_KH = np.eye(len(kf['x']), dtype=np.float32) - K @ kf['H']
+    kf['P'] = I_KH @ kf['P'] @ I_KH.T + K @ kf['R'] @ K.T
+    
+    # Ensure symmetry (force symmetry to combat numerical errors)
+    kf['P'] = (kf['P'] + kf['P'].T) / 2
 
 def get_position_estimate(kf):
     """Get position estimate from state"""
@@ -136,7 +143,7 @@ log_data = {}
 frames_since_detection = {}
 
 # ======= Main Loop =======
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(3)
 frame_count = 0
 
 print("Starting ArUco tracking with Kalman filtering...")
